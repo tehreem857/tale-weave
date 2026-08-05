@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TaleWeave - Original stories and novels. Enjoy a cozy, distraction-free reading experience, explore original narratives across genres, and subscribe for updates.">
+  <meta name="keywords" content="original stories, web novels, cozy reading, bookish, fantasy stories, mystery fiction, author website">
+  <title>TaleWeave | Original Stories & Chronicles</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Prevent theme flash -->
+  <script>
+    (function() {
+      const t = localStorage.getItem('taleweave-theme');
+      const s = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', t || (s ? 'dark' : 'light'));
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Reading Progress Bar -->
+  <div id="reading-progress-container" class="reading-progress-container" style="display:none;">
+    <div id="reading-progress-bar" class="reading-progress-bar"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="main-header">
+    <div class="header-container">
+      <a href="#/" class="logo-link" id="nav-logo">
+        <span class="quill-logo">✒️</span>
+        <span class="site-title">TaleWeave</span>
+      </a>
+      <nav class="desktop-nav" aria-label="Desktop Navigation">
+        <a href="#/" class="nav-item" id="nav-link-home">Home</a>
+        <a href="#/stories" class="nav-item" id="nav-link-stories">Stories</a>
+        <a href="#/about" class="nav-item" id="nav-link-about">About</a>
+        <a href="#/contact" class="nav-item" id="nav-link-contact">Contact</a>
+        <a href="#/admin" class="nav-item admin-nav-btn" id="nav-link-admin">Admin</a>
+      </nav>
+      <div class="header-controls">
+        <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon moon-icon"></i>
+          <i class="fa-solid fa-sun sun-icon"></i>
+        </button>
+        <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="mobile-drawer" class="mobile-drawer" aria-hidden="true">
+    <nav class="mobile-nav">
+      <a href="#/" class="mobile-nav-item">Home</a>
+      <a href="#/stories" class="mobile-nav-item">Stories</a>
+      <a href="#/about" class="mobile-nav-item">About</a>
+      <a href="#/contact" class="mobile-nav-item">Contact</a>
+      <a href="#/admin" class="mobile-nav-item mobile-admin-btn">Admin Panel</a>
+    </nav>
+  </div>
+  <div id="drawer-overlay" class="drawer-overlay"></div>
+
+  <!-- App Root -->
+  <main id="app-root" class="main-content">
+    <div class="initial-loader"><div class="spinner"></div><p>Opening the archives...</p></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">✒️ TaleWeave</div>
+        <p class="footer-tagline">Original tales crafted with love and ink. Escape into cozy worlds, chapter by chapter.</p>
+        <div class="footer-socials">
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="Pinterest"><i class="fa-brands fa-pinterest"></i></a>
+          <a href="#" aria-label="Goodreads"><i class="fa-brands fa-goodreads-g"></i></a>
+        </div>
+      </div>
+      <div class="footer-links-group">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="#/">Home</a></li>
+          <li><a href="#/stories">Browse Stories</a></li>
+          <li><a href="#/about">About the Author</a></li>
+          <li><a href="#/contact">Get in Touch</a></li>
+        </ul>
+      </div>
+      <div class="footer-links-group">
+        <h4>Explore Genres</h4>
+        <ul>
+          <li><a href="#/stories">Fantasy</a></li>
+          <li><a href="#/stories">Mystery</a></li>
+          <li><a href="#/stories">Cozy Romance</a></li>
+          <li><a href="#/stories">Sci-Fi Adventures</a></li>
+        </ul>
+      </div>
+      <div class="footer-newsletter">
+        <h4>The Newsletter</h4>
+        <p>Subscribe to receive letters about new chapters, character artwork, and writer diaries.</p>
+        <form id="footer-newsletter-form" class="newsletter-form">
+          <input type="email" placeholder="Your email address" required aria-label="Email for newsletter">
+          <button type="submit" class="newsletter-submit">Subscribe</button>
+        </form>
+        <div id="newsletter-success" class="newsletter-success-msg" style="display:none;">
+          <i class="fa-solid fa-circle-check"></i> Welcome to the reading circle!
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 TaleWeave. All rights reserved.</p>
+      <p class="quill-credits">Crafted with ✒️ & ☕</p>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       ALL JAVASCRIPT (bundled inline for local file:// compatibility)
+       ============================================================ -->
+  <script>
+  // ================================================================
+  // STORE - LocalStorage data layer
+  // ================================================================
+  const SEED_STORIES = [
+    {
+      id: "whispering-canopy",
+      title: "The Whispering Canopy",
+      genre: "Fantasy",
+      author: "Elara Vance",
+      cover: "assets/cover-whispers.jpg",
+      excerpt: "Deep within the Heartwood, the trees don't just grow—they speak. When a young cartographer is sent to map the forbidden forest, she discovers that the trees are keeping a secret that could break the kingdom.",
+      readingTime: 12,
+      publishDate: "2026-05-15",
+      popularity: 142,
+      status: "published",
+      chapters: [
+        {
+          title: "Chapter 1: The Ink-Stained Map",
+          content: "Elara's fingers traced the faded borders of the old kingdom maps. They were beautiful, certainly, decorated with sea serpents in the margins and sweeping gold script. But they were incomplete. In the center lay a vast blank space, marked only with the warning: *The Heartwood Canopy—Unchartable.*\n\n\"A cartographer's job is to put boundaries on the unknown, Elara,\" her grandfather had told her when he handed her the brass compass. \"But some places refuse to be measured.\"\n\nNow, standing at the forest's edge, she understood what he meant. The trees were massive, their trunks like ancient stone pillars rising into a dense roof of silver leaves. But it wasn't their size that made her hesitate; it was the sound. It wasn't the rustle of wind. It was a low, melodic hum, like thousands of distant voices whispering in a language just out of reach.\n\nShe stepped across the mossy boundary.\n\nAlmost immediately, the light changed. The sun was filtered through the silver leaves, casting a shimmering green glow over the forest floor. Her compass needle spun lazily, pointing in no clear direction before settling due east—towards the deepest part of the wood.\n\n\"Fascinating,\" she muttered, pulling out her notebook to sketch the root structures. As she touched her pen to the paper, a soft voice breathed in her ear:\n\n*\"Write carefully, little crow. The ink remembers everything.\"*\n\nShe spun around, but there was no one there. Only the great trees, their silver leaves shimmering in the quiet air."
+        },
+        {
+          title: "Chapter 2: The Firefly Glen",
+          content: "By evening, the forest had grown dark, but it was far from pitch black. Soft bioluminescent moss covered the fallen logs, and glowing white mushrooms dotted the roots of the ancient trees.\n\nElara set up her small canvas tent in a small clearing. She lit a fire, the wood crackling softly as she boiled water for tea.\n\nAs the steam rose, a cluster of glowing fireflies began to gather around her. They didn't fly randomly; they floated in structured patterns, grouping themselves into geometric shapes that mirrored the constellations on her star charts.\n\n\"Are you... mapping the sky?\" she asked aloud, feeling slightly foolish.\n\nTo her astonishment, the fireflies shifted. They drifted apart and reformed into the shape of a hand, pointing towards the eastern ridge.\n\nShe grabbed her lantern and followed. The fireflies led her through a narrow archway of intertwined birch trees into a hidden glen. In the center of the glen stood a pool of perfectly still water. Unlike normal water, it didn't reflect the trees around it; it reflected a vibrant city of stone arches and floating towers under a sky filled with three moons.\n\n*\"This is the memory of what was,\"* the whispering leaves murmured in unison. *\"And the shadow of what could return, if the canopy falls.\"*\n\nElara walked to the water's edge and looked down. She realized she wasn't mapping a wilderness. She was mapping a graveyard of a forgotten magic."
+        }
+      ]
+    },
+    {
+      id: "shadows-inkwell",
+      title: "Shadows in the Inkwell",
+      genre: "Mystery",
+      author: "Elara Vance",
+      cover: "assets/cover-shadows.jpg",
+      excerpt: "Every story written by Arthur Pendelton came true. But when the celebrated mystery novelist is found dead at his desk, his final, unfinished manuscript points to a killer that shouldn't exist.",
+      readingTime: 8,
+      publishDate: "2026-06-20",
+      popularity: 98,
+      status: "published",
+      chapters: [
+        {
+          title: "The Unfinished Line",
+          content: "Inspector Joshua Finch liked things that were tidy. He liked his tea hot, his notebooks lined, and his cases wrapped up in neat manila folders.\n\nThe study of Arthur Pendelton was the opposite of tidy.\n\nBooks were piled high on every surface, pages of manuscript scattered like dry leaves across the Persian rug. In the center of the chaos sat the novelist, slumped over his heavy oak desk, a copper-nibbed pen still held loosely in his cold fingers.\n\n\"The doctor says it was heart failure, sir,\" Sergeant Miller said, tipping his hat. \"At seventy-two, it's not a surprise.\"\n\n\"He was writing, Miller,\" Finch remarked, stepping closer. \"A man doesn't usually die of a peaceful heart attack in the middle of a stroke.\"\n\nFinch gently slid the paper from beneath Pendelton's hand. The ink was dry, but the final sentence was unfinished:\n\n*Joshua Finch stepped into the study, unaware that the killer was standing right behind the—*\n\nFinch felt a chill run down his spine. He looked at the paper, then at the body of the novelist.\n\n\"Is something wrong, Inspector?\" Miller asked.\n\n\"Look at the name in the sentence, Miller,\" Finch whispered. \"He wrote my name. He wrote it before I was even assigned to this precinct.\"\n\nArthur Pendelton was famous for his eerie accuracy. Criminals he invented were captured in real life doing the exact same crimes. Now, he had written the inspector into his own death scene. Finch turned around slowly, looking at the heavy velvet curtains hanging in the corner of the dark room.\n\nA floorboard creaked behind him."
+        }
+      ]
+    },
+    {
+      id: "stardust-tea-leaves",
+      title: "Stardust and Tea Leaves",
+      genre: "Sci-Fi",
+      author: "Elara Vance",
+      cover: "assets/cover-stardust.jpg",
+      excerpt: "At the edge of the galaxy, the Voyager's Cafe serves hot beverages to weary spacefarers. But when an alien diplomat leaves behind a container of glowing blue tea, the barista accidentally brews a timeline collapse.",
+      readingTime: 15,
+      publishDate: "2026-06-10",
+      popularity: 115,
+      status: "published",
+      chapters: [
+        {
+          title: "Chapter 1: The Nebula Brew",
+          content: "Operating a cafe on a hollowed-out asteroid in the Orion Spur was mostly boring. Mae spent her days wiping down the steel counter, cleaning the espresso filters, and listening to the complaints of cargo haulers.\n\nBut Tuesdays were different. Tuesdays were when the diplomats from the inner rings stopped by.\n\n\"The usual, Ambassador?\" Mae asked, smiling at the tall, slender alien with iridescent violet skin.\n\n\"Thank you, Mae. Make it extra hot. The transit through the gravity well was chilly today,\" the diplomat replied, placing a small metal canister on the bar.\n\nWhile Mae brewed his chamomile-blend, the diplomat received an urgent comms ping. He stood up, spoke in hurried tones to his wrist-link, and rushed out, forgetting the canister on the counter.\n\nMae called after him, but he had already boarded the shuttle. She picked up the canister. It was warm to the touch, and when she opened it, a sweet fragrance of lavender and ozone filled the air. Inside were leaves that glowed with a faint blue stardust.\n\n\"Well,\" Mae thought, looking at the empty cafe. \"He won't mind if I try one cup.\"\n\nShe heated a pot of mineral water and tossed a pinch of the glowing leaves in. The water turned a beautiful, swirling sapphire blue, reflecting tiny pinpricks of light like a miniature galaxy.\n\nShe took a sip.\n\nThe taste was incredible—mint, honey, and a strange tingling sensation. But as she swallowed, the sound of the cafe's refrigerator hum disappeared. The asteroid's artificial gravity flickered. She looked out the panoramic window.\n\nThe nebula outside wasn't moving anymore. The stars had stopped twinkling. Everything was perfectly, silent, frozen in time. Except for her."
+        },
+        {
+          title: "Chapter 2: The Voyager's Lounge",
+          content: "Mae stepped out from behind the counter, her boots making no sound on the metal floor. She walked over to the windows.\n\nOutside, a cargo ship was frozen mid-takeoff, the orange plasma thrust locked in a static, glowing flame. A spilled coffee cup belonging to a trucker sat suspended in the air, a globule of dark liquid floating an inch above the table.\n\n\"Okay,\" Mae said, her voice sounding flat and echo-free. \"I broke time.\"\n\n*\"You didn't break it,\"* a voice said from the back booth. *\"You just stepped between the gears.\"*\n\nMae gasped, spinning around. Sitting in the corner booth was a woman she had never seen before, wearing a flight jacket that looked like it had been patched with pieces of space suits from five different centuries. She was calmly sipping a cup of the same blue tea.\n\n\"Who are you?\" Mae asked, holding her wiping cloth like a weapon.\n\n\"I'm Captain Julia,\" the woman said, gesturing for Mae to sit down. \"I'm the cartographer of the lost hours. That tea you drank is made from chronon-infused leaves. It detaches your consciousness from the standard timeline. It's very expensive, and very dangerous if you drink it without a guide.\"\n\n\"A guide?\" Mae walked over, looking at the floating coffee bubble. \"How do I turn it off?\"\n\n\"You don't,\" Julia said, smiling. \"Not until we find the diplomat. Because he didn't forget that jar, Mae. He was running from the people who want to burn the timeline down.\""
+        }
+      ]
+    }
+  ];
+
+  const KEYS = {
+    STORIES: "taleweave-stories",
+    BOOKMARKS: "taleweave-bookmarks",
+    COMMENTS: "taleweave-comments",
+    SESSION: "taleweave-session"
+  };
+
+  function initStore() {
+    if (!localStorage.getItem(KEYS.STORIES)) {
+      localStorage.setItem(KEYS.STORIES, JSON.stringify(SEED_STORIES));
+    }
+    if (!localStorage.getItem(KEYS.BOOKMARKS)) {
+      localStorage.setItem(KEYS.BOOKMARKS, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(KEYS.COMMENTS)) {
+      const initial = {
+        "whispering-canopy": [
+          { id: 1, author: "Jane Reader", date: "2026-05-16 10:30", content: "Oh my goodness! The imagery of the trees whispering is so beautiful. I cannot wait to read what lies in the Firefly Glen!" },
+          { id: 2, author: "Bookworm99", date: "2026-05-18 14:15", content: "I love the mystery setup. Please upload Chapter 3 soon!" }
+        ],
+        "shadows-inkwell": [
+          { id: 3, author: "MysteryLover", date: "2026-06-21 09:00", content: "This gave me absolute goosebumps. What a thriller!" }
+        ]
+      };
+      localStorage.setItem(KEYS.COMMENTS, JSON.stringify(initial));
+    }
+  }
+
+  function getStories(includeDrafts) {
+    const s = JSON.parse(localStorage.getItem(KEYS.STORIES)) || [];
+    return includeDrafts ? s : s.filter(x => x.status === "published");
+  }
+  function getStory(id) { return (JSON.parse(localStorage.getItem(KEYS.STORIES)) || []).find(s => s.id === id); }
+  function saveStory(story) {
+    const stories = JSON.parse(localStorage.getItem(KEYS.STORIES)) || [];
+    const idx = stories.findIndex(s => s.id === story.id);
+    if (idx !== -1) stories[idx] = { ...stories[idx], ...story };
+    else stories.push(story);
+    localStorage.setItem(KEYS.STORIES, JSON.stringify(stories));
+  }
+  function deleteStory(id) {
+    let stories = JSON.parse(localStorage.getItem(KEYS.STORIES)) || [];
+    stories = stories.filter(s => s.id !== id);
+    localStorage.setItem(KEYS.STORIES, JSON.stringify(stories));
+    const c = JSON.parse(localStorage.getItem(KEYS.COMMENTS)) || {};
+    delete c[id]; localStorage.setItem(KEYS.COMMENTS, JSON.stringify(c));
+    const b = JSON.parse(localStorage.getItem(KEYS.BOOKMARKS)) || [];
+    localStorage.setItem(KEYS.BOOKMARKS, JSON.stringify(b.filter(x => x !== id)));
+  }
+  function getBookmarks() { return JSON.parse(localStorage.getItem(KEYS.BOOKMARKS)) || []; }
+  function toggleBookmark(id) {
+    const b = getBookmarks(); const i = b.indexOf(id);
+    if (i !== -1) { b.splice(i, 1); localStorage.setItem(KEYS.BOOKMARKS, JSON.stringify(b)); return false; }
+    else { b.push(id); localStorage.setItem(KEYS.BOOKMARKS, JSON.stringify(b)); return true; }
+  }
+  function isBookmarked(id) { return getBookmarks().includes(id); }
+  function getComments(storyId) { return (JSON.parse(localStorage.getItem(KEYS.COMMENTS)) || {})[storyId] || []; }
+  function addComment(storyId, author, content) {
+    const db = JSON.parse(localStorage.getItem(KEYS.COMMENTS)) || {};
+    if (!db[storyId]) db[storyId] = [];
+    const now = new Date();
+    const d = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const c = { id: Date.now(), author: author || "Anonymous Reader", date: d, content };
+    db[storyId].push(c);
+    localStorage.setItem(KEYS.COMMENTS, JSON.stringify(db));
+    return c;
+  }
+  function storeLogin(u, p) {
+    if (u === "admin" && p === "writer123") { localStorage.setItem(KEYS.SESSION, JSON.stringify({ username: "admin" })); return true; }
+    return false;
+  }
+  function storeLogout() { localStorage.removeItem(KEYS.SESSION); }
+  function getCurrentUser() { return JSON.parse(localStorage.getItem(KEYS.SESSION)); }
+
+  // ================================================================
+  // ROUTER
+  // ================================================================
+  function getRouteInfo() {
+    let hash = window.location.hash || "#/";
+    let path = hash.slice(1) || "/";
+    let queryParams = {};
+    if (path.includes("?")) {
+      const parts = path.split("?");
+      path = parts[0];
+      new URLSearchParams(parts[1]).forEach((v, k) => { queryParams[k] = v; });
+    }
+    const patterns = [
+      { pattern: /^\/story\/([^\/]+)\/chapter\/(\d+)$/, keys: ["id","chapterNum"], view: "reader" },
+      { pattern: /^\/story\/([^\/]+)$/, keys: ["id"], view: "reader" },
+      { pattern: /^\/admin\/edit\/([^\/]+)$/, keys: ["id"], view: "admin" },
+      { pattern: /^\/admin\/new$/, keys: [], view: "admin" },
+      { pattern: /^\/admin$/, keys: [], view: "admin" },
+      { pattern: /^\/stories$/, keys: [], view: "stories" },
+      { pattern: /^\/about$/, keys: [], view: "about" },
+      { pattern: /^\/contact$/, keys: [], view: "contact" },
+      { pattern: /^\/$/, keys: [], view: "home" }
+    ];
+    for (const p of patterns) {
+      const m = path.match(p.pattern);
+      if (m) {
+        const params = {};
+        p.keys.forEach((k, i) => { params[k] = m[i + 1]; });
+        return { view: p.view, params, queryParams, path };
+      }
+    }
+    return { view: "404", params: {}, queryParams, path };
+  }
+
+  function updateActiveNav(path) {
+    document.querySelectorAll(".nav-item, .mobile-nav-item").forEach(el => el.classList.remove("active"));
+    const root = "/" + (path.split("/")[1] || "");
+    document.querySelectorAll(`.nav-item[href="#${root}"], .mobile-nav-item[href="#${root}"]`).forEach(el => el.classList.add("active"));
+    if (path === "/") document.querySelectorAll('.nav-item[href="#/"], .mobile-nav-item[href="#/"]').forEach(el => el.classList.add("active"));
+  }
+
+  function navigate() {
+    const { view, params, queryParams, path } = getRouteInfo();
+    const root = document.getElementById("app-root");
+    const progressBar = document.getElementById("reading-progress-container");
+
+    // Control reading progress bar
+    progressBar.style.display = (view === "reader") ? "block" : "none";
+
+    // Remove distraction-free on navigate
+    document.body.classList.remove("distraction-free");
+
+    updateActiveNav(path);
+
+    // Fade transition
+    root.style.opacity = "0";
+    root.style.transition = "opacity 0.2s ease";
+
+    setTimeout(() => {
+      switch(view) {
+        case "home": renderHome(root); break;
+        case "stories": renderStories(root, queryParams); break;
+        case "reader": renderReader(root, params); break;
+        case "about": renderAbout(root); break;
+        case "contact": renderContact(root); break;
+        case "admin": renderAdmin(root, params); break;
+        default: render404(root);
+      }
+      root.style.opacity = "1";
+      window.scrollTo(0, 0);
+    }, 150);
+  }
+
+  function render404(root) {
+    root.innerHTML = `
+      <div class="section-header" style="padding:8rem 2rem;">
+        <div style="font-size:5rem;margin-bottom:1.5rem;">🧭</div>
+        <h2 class="section-title">Lost in the Archives</h2>
+        <p class="section-subtitle">This chronicle path is blank. Let's find our way back.</p>
+        <div style="margin-top:2.5rem;"><a href="#/" class="btn btn-primary">Return to Home</a></div>
+      </div>`;
+  }
+
+  // ================================================================
+  // HOME VIEW
+  // ================================================================
+  function renderHome(root) {
+    const stories = getStories(false);
+    const sorted = [...stories].sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+    const featured = sorted.find(s => s.popularity > 100) || sorted[0];
+    const latest = sorted.slice(0, 3);
+
+    root.innerHTML = `
+      <section class="home-hero">
+        <div class="hero-content">
+          <span class="hero-pretitle">Welcome to the Story Parlor</span>
+          <h1 class="hero-title">Ink, Tea &amp; Cozier Chronicles</h1>
+          <p class="hero-description">Step inside a library of original tales woven with magic, mystery, and heart. Pull up a chair, pour a cup of tea, and escape into cozy, hand-crafted worlds.</p>
+          <div class="hero-actions">
+            <a href="#/stories" class="btn btn-primary"><i class="fa-solid fa-book-open"></i> Browse Stories</a>
+            <a href="#/about" class="btn btn-secondary">Meet the Author</a>
+          </div>
+        </div>
+      </section>
+
+      ${featured ? `
+      <section class="featured-section">
+        <div class="section-header">
+          <span class="section-subtitle">A Highlight from the Quill</span>
+          <h2 class="section-title">Featured Masterpiece</h2>
+          <div class="ornament-divider"><div class="ornament-line"></div><div class="ornament-symbol">❦</div><div class="ornament-line"></div></div>
+        </div>
+        <div class="featured-card">
+          <div class="featured-image-wrapper">
+            <img src="${featured.cover}" alt="${featured.title}" class="featured-image" onerror="this.src='https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=600'">
+            <span class="featured-badge">✦ Featured</span>
+          </div>
+          <div class="featured-info">
+            <div class="featured-meta">
+              <span><i class="fa-solid fa-tag"></i> ${featured.genre}</span>
+              <span><i class="fa-regular fa-clock"></i> ${featured.readingTime} min read</span>
+              <span><i class="fa-regular fa-calendar"></i> ${fmtDate(featured.publishDate)}</span>
+            </div>
+            <h3 class="featured-story-title">${featured.title}</h3>
+            <p class="featured-summary">${featured.excerpt}</p>
+            <div class="featured-actions">
+              <a href="#/story/${featured.id}" class="btn btn-primary">Start Reading</a>
+              <button class="bookmark-btn ${isBookmarked(featured.id)?'bookmarked':''}" data-id="${featured.id}" title="Bookmark">
+                <i class="fa-${isBookmarked(featured.id)?'solid':'regular'} fa-bookmark"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>` : ''}
+
+      <section class="latest-section">
+        <div class="latest-container">
+          <div class="section-header">
+            <span class="section-subtitle">Freshly Dipped in Ink</span>
+            <h2 class="section-title">The Latest Stories</h2>
+            <div class="ornament-divider"><div class="ornament-line"></div><div class="ornament-symbol">❦</div><div class="ornament-line"></div></div>
+          </div>
+          <div class="stories-grid">
+            ${latest.map(s => storyCard(s)).join('')}
+          </div>
+          <div style="text-align:center;margin-top:3.5rem;">
+            <a href="#/stories" class="btn btn-secondary">View All Chronicles</a>
+          </div>
+        </div>
+      </section>`;
+
+    bindBookmarkBtns(root);
+  }
+
+  // ================================================================
+  // STORIES GALLERY VIEW
+  // ================================================================
+  function renderStories(root, queryParams) {
+    const allStories = getStories(false);
+    const genres = ["All", ...new Set(allStories.map(s => s.genre))];
+    let search = "", selectedGenre = queryParams.genre || "All", sortBy = "newest";
+
+    root.innerHTML = `
+      <section class="browse-section">
+        <div class="section-header">
+          <span class="section-subtitle">Leaf through the Chronicles</span>
+          <h2 class="section-title">The Story Archives</h2>
+          <div class="ornament-divider"><div class="ornament-line"></div><div class="ornament-symbol">📜</div><div class="ornament-line"></div></div>
+        </div>
+        <div class="filters-bar">
+          <div class="filters-top">
+            <div class="search-wrapper">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="search-input" class="form-control" placeholder="Search chronicles by title or keyword..." aria-label="Search stories">
+            </div>
+            <select id="sort-select" class="form-control" aria-label="Sort stories">
+              <option value="newest">Sort: Newest Uploads</option>
+              <option value="oldest">Sort: Oldest Archives</option>
+              <option value="popular">Sort: Most Popular</option>
+              <option value="alphabetical">Sort: Alphabetical (A-Z)</option>
+            </select>
+          </div>
+          <div class="genre-filters">
+            <span class="control-label" style="margin-right:0.5rem;">Genres:</span>
+            ${genres.map(g => `<button class="genre-pill ${g===selectedGenre?'active':''}" data-genre="${g}">${g}</button>`).join('')}
+          </div>
+        </div>
+        <div id="stories-grid-root" class="stories-grid"></div>
+      </section>`;
+
+    const gridRoot = document.getElementById("stories-grid-root");
+
+    function updateGrid() {
+      let filtered = allStories.filter(s => {
+        const ms = s.title.toLowerCase().includes(search.toLowerCase()) || s.excerpt.toLowerCase().includes(search.toLowerCase());
+        const mg = selectedGenre === "All" || s.genre === selectedGenre;
+        return ms && mg;
+      });
+      if (sortBy === "newest") filtered.sort((a,b) => new Date(b.publishDate)-new Date(a.publishDate));
+      else if (sortBy === "oldest") filtered.sort((a,b) => new Date(a.publishDate)-new Date(b.publishDate));
+      else if (sortBy === "popular") filtered.sort((a,b) => b.popularity-a.popularity);
+      else filtered.sort((a,b) => a.title.localeCompare(b.title));
+
+      if (!filtered.length) {
+        gridRoot.innerHTML = `<div class="no-results"><i class="fa-regular fa-folder-open"></i><h3>No chronicles found</h3><p>Try clearing your filters or changing your search terms.</p></div>`;
+        return;
+      }
+      gridRoot.innerHTML = filtered.map(s => storyCard(s)).join('');
+      bindBookmarkBtns(gridRoot);
+    }
+
+    document.getElementById("search-input").addEventListener("input", e => { search = e.target.value; updateGrid(); });
+    document.getElementById("sort-select").addEventListener("change", e => { sortBy = e.target.value; updateGrid(); });
+    root.querySelectorAll(".genre-pill").forEach(pill => {
+      pill.addEventListener("click", () => {
+        root.querySelectorAll(".genre-pill").forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        selectedGenre = pill.dataset.genre;
+        updateGrid();
+      });
+    });
+    updateGrid();
+  }
+
+  // ================================================================
+  // STORY READER VIEW
+  // ================================================================
+  function renderReader(root, params) {
+    const story = getStory(params.id);
+    if (!story) { root.innerHTML = `<div class="section-header" style="padding:8rem 2rem;"><div style="font-size:5rem">📖</div><h2 class="section-title">Story Not Found</h2><p class="section-subtitle">The scroll you requested does not exist.</p><div style="margin-top:2rem;"><a href="#/stories" class="btn btn-primary">Back to Archives</a></div></div>`; return; }
+
+    const chIdx = params.chapterNum ? parseInt(params.chapterNum, 10) - 1 : 0;
+    const total = story.chapters.length;
+    if (chIdx < 0 || chIdx >= total) { root.innerHTML = `<div class="section-header" style="padding:8rem 2rem;"><h2 class="section-title">Chapter Not Found</h2><a href="#/story/${story.id}" class="btn btn-primary">Read First Chapter</a></div>`; return; }
+    const ch = story.chapters[chIdx];
+    const bookmarked = isBookmarked(story.id);
+
+    root.innerHTML = `
+      <div class="reader-container">
+        <div class="story-layout" id="story-layout-root">
+          ${total > 1 ? `
+          <aside class="story-sidebar">
+            <h4 class="sidebar-title">Table of Contents</h4>
+            <ul class="sidebar-toc-list">
+              ${story.chapters.map((c,i) => `<li class="sidebar-toc-item"><a href="#/story/${story.id}/chapter/${i+1}" class="sidebar-toc-link ${i===chIdx?'active':''}">${c.title}</a></li>`).join('')}
+            </ul>
+          </aside>` : ''}
+          <div class="reader-wrapper" ${total<=1?'style="grid-column:1/-1;max-width:720px;"':''}>
+            <header class="story-meta-header">
+              <span class="story-category-tag">${story.genre}</span>
+              <h1 class="story-main-title">${story.title}</h1>
+              ${total > 1 ? `<h2 class="chapter-subtitle">${ch.title}</h2>` : ''}
+              <div class="story-reader-meta">
+                <span><i class="fa-regular fa-user"></i> By ${story.author}</span>
+                <span><i class="fa-regular fa-clock"></i> ${story.readingTime} min read</span>
+                <span><i class="fa-regular fa-calendar"></i> ${fmtDateLong(story.publishDate)}</span>
+                <button id="reader-bookmark-btn" class="btn btn-secondary btn-sm ${bookmarked?'bookmarked':''}" style="border-radius:20px;display:flex;align-items:center;gap:0.4rem;">
+                  <i class="fa-${bookmarked?'solid':'regular'} fa-bookmark"></i>
+                  <span id="bookmark-label">${bookmarked?'Saved':'Bookmark'}</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="reader-controls-bar">
+              <div class="control-group">
+                <span class="control-label">Theme</span>
+                <div class="color-swatch-group">
+                  <button class="color-swatch swatch-light active" data-scheme="light" title="Light paper"></button>
+                  <button class="color-swatch swatch-sepia" data-scheme="sepia" title="Cozy sepia"></button>
+                  <button class="color-swatch swatch-dark" data-scheme="dark" title="Midnight"></button>
+                </div>
+              </div>
+              <div class="control-group">
+                <span class="control-label">Text</span>
+                <button id="font-decrease" class="control-btn" title="Decrease size"><i class="fa-solid fa-minus"></i></button>
+                <button id="font-increase" class="control-btn" title="Increase size"><i class="fa-solid fa-plus"></i></button>
+              </div>
+              <div class="control-group">
+                <button id="distraction-free-btn" class="control-btn"><i class="fa-solid fa-expand"></i> Focus</button>
+              </div>
+            </div>
+
+            <article id="reading-text-box" class="reading-text">
+              ${parseContent(ch.content)}
+            </article>
+
+            ${total > 1 ? `
+            <nav class="story-reader-footer-nav">
+              <div class="nav-chapter-box prev-chapter">
+                ${chIdx > 0 ? `<a href="#/story/${story.id}/chapter/${chIdx}"><span class="nav-chapter-label"><i class="fa-solid fa-arrow-left"></i> Previous</span><span class="nav-chapter-title">${story.chapters[chIdx-1].title}</span></a>` : `<span class="nav-chapter-label" style="opacity:0.4;">Beginning of Story</span>`}
+              </div>
+              <div class="nav-chapter-box next-chapter">
+                ${chIdx < total-1 ? `<a href="#/story/${story.id}/chapter/${chIdx+2}"><span class="nav-chapter-label">Next Chapter <i class="fa-solid fa-arrow-right"></i></span><span class="nav-chapter-title">${story.chapters[chIdx+1].title}</span></a>` : `<a href="#/stories"><span class="nav-chapter-label">The End</span><span class="nav-chapter-title">Back to Archives <i class="fa-solid fa-folder-open"></i></span></a>`}
+              </div>
+            </nav>` : `
+            <div style="text-align:center;margin:4rem 0;">
+              <div class="ornament-divider"><div class="ornament-line"></div><div class="ornament-symbol">✦</div><div class="ornament-line"></div></div>
+              <a href="#/stories" class="btn btn-secondary"><i class="fa-solid fa-reply"></i> Return to Archives</a>
+            </div>`}
+
+            <div class="share-section">
+              <h4 class="share-title">Enjoyed the reading? Share this story:</h4>
+              <div class="share-buttons">
+                <button class="share-icon-btn" id="share-copy" title="Copy link"><i class="fa-solid fa-link"></i></button>
+                <button class="share-icon-btn" id="share-twitter" title="Share on Twitter"><i class="fa-brands fa-twitter"></i></button>
+                <button class="share-icon-btn" id="share-facebook" title="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></button>
+              </div>
+            </div>
+            <div id="toast-notify" class="share-toast">Link copied! ✒️</div>
+
+            <section class="comments-section">
+              <h3 class="comments-title">Comments Parlor</h3>
+              <form id="comment-post-form" class="comment-form">
+                <div class="comment-form-row">
+                  <div class="form-group">
+                    <label for="comment-author-input">Your Scribe Name</label>
+                    <input type="text" id="comment-author-input" class="form-control" placeholder="E.g., Jane Reader" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="comment-email-input">Email (never visible)</label>
+                    <input type="email" id="comment-email-input" class="form-control" placeholder="E.g., jane@email.com">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="comment-text-input">Your Thoughts</label>
+                  <textarea id="comment-text-input" class="form-control" placeholder="Share your thoughts, theories or encouragement..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Leave a Comment</button>
+              </form>
+              <div id="comments-list-root" class="comments-list"></div>
+            </section>
+          </div>
+        </div>
+      </div>`;
+
+    // Font size control
+    let fontSize = 1.15;
+    const textBox = document.getElementById("reading-text-box");
+    document.getElementById("font-increase").addEventListener("click", () => { if(fontSize<1.7){fontSize+=0.1;textBox.style.fontSize=fontSize+"rem";} });
+    document.getElementById("font-decrease").addEventListener("click", () => { if(fontSize>0.9){fontSize-=0.1;textBox.style.fontSize=fontSize+"rem";} });
+
+    // Color swatches
+    root.querySelectorAll(".color-swatch").forEach(sw => {
+      sw.addEventListener("click", () => {
+        root.querySelectorAll(".color-swatch").forEach(s=>s.classList.remove("active"));
+        sw.classList.add("active");
+        const scheme = sw.dataset.scheme;
+        if(scheme==="light"){ textBox.style.background="#FDFBF7"; textBox.style.color="#2C2520"; }
+        else if(scheme==="sepia"){ textBox.style.background="#F4ECD8"; textBox.style.color="#433422"; }
+        else { textBox.style.background="#181E1A"; textBox.style.color="#EAE5D9"; }
+      });
+    });
+
+    // Distraction free
+    document.getElementById("distraction-free-btn").addEventListener("click", function() {
+      const on = document.body.classList.toggle("distraction-free");
+      this.innerHTML = on ? '<i class="fa-solid fa-compress"></i> Unfocus' : '<i class="fa-solid fa-expand"></i> Focus';
+    });
+
+    // Bookmark
+    document.getElementById("reader-bookmark-btn").addEventListener("click", function() {
+      const active = toggleBookmark(story.id);
+      this.querySelector("i").className = `fa-${active?'solid':'regular'} fa-bookmark`;
+      document.getElementById("bookmark-label").textContent = active ? "Saved" : "Bookmark";
+      this.classList.toggle("bookmarked", active);
+    });
+
+    // Share
+    const toast = document.getElementById("toast-notify");
+    function showToast() { toast.classList.add("show"); setTimeout(()=>toast.classList.remove("show"), 2500); }
+    document.getElementById("share-copy").addEventListener("click", () => { navigator.clipboard.writeText(window.location.href).then(showToast).catch(()=>showToast()); });
+    document.getElementById("share-twitter").addEventListener("click", () => { window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('"'+story.title+'" — reading on TaleWeave')}&url=${encodeURIComponent(window.location.href)}`,"_blank"); });
+    document.getElementById("share-facebook").addEventListener("click", () => { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,"_blank"); });
+
+    // Comments
+    function renderComments() {
+      const list = getComments(story.id);
+      const el = document.getElementById("comments-list-root");
+      if (!list.length) { el.innerHTML = `<div class="no-comments">No comments yet. Be the first to share your thoughts!</div>`; return; }
+      el.innerHTML = [...list].reverse().map(c => `<div class="comment-card"><div class="comment-header"><span class="comment-author">${escHtml(c.author)}</span><span class="comment-date">${c.date}</span></div><p class="comment-body">${escHtml(c.content)}</p></div>`).join('');
+    }
+    document.getElementById("comment-post-form").addEventListener("submit", e => {
+      e.preventDefault();
+      addComment(story.id, document.getElementById("comment-author-input").value, document.getElementById("comment-text-input").value);
+      e.target.reset();
+      renderComments();
+    });
+    renderComments();
+  }
+
+  // ================================================================
+  // ABOUT VIEW
+  // ================================================================
+  function renderAbout(root) {
+    root.innerHTML = `
+      <section class="about-container">
+        <div class="section-header">
+          <span class="section-subtitle">Behind the Scribe's Desk</span>
+          <h2 class="section-title">About the Author</h2>
+          <div class="ornament-divider"><div class="ornament-line"></div><div class="ornament-symbol">✒️</div><div class="ornament-line"></div></div>
+        </div>
+        <div class="about-grid">
+          <div class="about-portrait-wrapper">
+            <img src="assets/author.jpg" alt="Author Portrait" class="about-portrait" onerror="this.src='https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=400'">
+          </div>
+          <div class="about-story">
+            <h3>Hello, I'm Elara Vance</h3>
+            <p>I believe that every story begins with a quiet room, a fresh cup of jasmine tea, and the soft scratch of a quill on parchment. For as long as I can remember, I have been gathering scraps of conversations, tracing maps of imaginary forests, and weaving narratives out of stardust.</p>
+            <p>My writing journey began in the margins of my school notebooks. Over the years, those scribbled ideas grew into full-fledged worlds. My goal is to create cozy, immersive reading experiences—the kinds of stories you want to curl up with on a rainy afternoon, wrapped in a warm blanket.</p>
+            <h3>My Creative Sanctuary</h3>
+            <p>When I am not writing, you can find me wandering through botanical gardens, searching for hidden gems in dusty antiquarian bookshops, or experimenting with tea blends. I draw heavy inspiration from nature, ancient folklore, retro-futurism, and the small, magical moments hidden in everyday life.</p>
+            <h3>Favorite Genres</h3>
+            <div class="about-genres-list">
+              <span class="about-genre-item">Cozy Fantasy</span>
+              <span class="about-genre-item">Gothic Mystery</span>
+              <span class="about-genre-item">Soft Sci-Fi</span>
+              <span class="about-genre-item">Slice of Life</span>
+              <span class="about-genre-item">Fairy Tale Retellings</span>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-section">
+          <h3 class="timeline-title">The Writing Journey</h3>
+          <div class="timeline">
+            <div class="timeline-item timeline-left"><div class="timeline-content"><div class="timeline-year">2018</div><h4 class="timeline-event-title">The First Spark</h4><p>Wrote a collection of cozy fables and self-published a small booklet for family and friends.</p></div></div>
+            <div class="timeline-item timeline-right"><div class="timeline-content"><div class="timeline-year">2021</div><h4 class="timeline-event-title">Leaving the Shore</h4><p>Published the gothic-mystery short story "Shadows in the Inkwell" in a local fantasy anthology.</p></div></div>
+            <div class="timeline-item timeline-left"><div class="timeline-content"><div class="timeline-year">2023</div><h4 class="timeline-event-title">Mapping the Heartwood</h4><p>Began drafting "The Whispering Canopy" during a cold autumn, spending months walking in forests.</p></div></div>
+            <div class="timeline-item timeline-right"><div class="timeline-content"><div class="timeline-year">2026</div><h4 class="timeline-event-title">TaleWeave is Born</h4><p>Launched this digital storytelling parlor — a cozy, distraction-free library to share serialized chapters.</p></div></div>
+          </div>
+        </div>
+      </section>`;
+  }
+
+  // ================================================================
+  // CONTACT VIEW
+  // ================================================================
+  function renderContact(root) {
+    root.innerHTML = `
+      <section class="contact-container">
+        <div class="section-header">
+          <span class="section-subtitle">Send a Letter to the Scribe</span>
+          <h2 class="section-title">Get in Touch</h2>
+          <div class="ornament-divider"><div class="ornament-line"></div><div class="ornament-symbol">✉</div><div class="ornament-line"></div></div>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-info">
+            <p class="contact-intro">Have a question about a character? A theory about the forest whispers? I'd love to hear from you. I read every single message!</p>
+            <div class="contact-method">
+              <div class="contact-method-icon"><i class="fa-regular fa-envelope"></i></div>
+              <div class="contact-method-text"><h5>Email</h5><p>elara@taleweave.com</p></div>
+            </div>
+            <div class="contact-method">
+              <div class="contact-method-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+              <div class="contact-method-text"><h5>The Scribe's Cottage</h5><p>Somewhere between the Heartwood and the stars</p></div>
+            </div>
+            <div class="contact-method">
+              <div class="contact-method-icon"><i class="fa-regular fa-paper-plane"></i></div>
+              <div class="contact-method-text"><h5>Social Channels</h5><p>@ElaraVanceWrites on all platforms</p></div>
+            </div>
+          </div>
+          <div class="contact-form-wrapper" id="contact-form-wrap">
+            <form id="contact-mail-form">
+              <div class="form-group"><label for="c-name">Your Full Name</label><input type="text" id="c-name" class="form-control" placeholder="E.g., Julian Vance" required></div>
+              <div class="form-group"><label for="c-email">Email Address</label><input type="email" id="c-email" class="form-control" placeholder="E.g., julian@domain.com" required></div>
+              <div class="form-group"><label for="c-subject">Subject</label><input type="text" id="c-subject" class="form-control" placeholder="E.g., Heartwood Theory" required></div>
+              <div class="form-group"><label for="c-message">Your Message</label><textarea id="c-message" class="form-control" placeholder="Write your letter here..." required></textarea></div>
+              <button type="submit" class="btn btn-primary" style="width:100%;">Send Letter <i class="fa-regular fa-paper-plane"></i></button>
+            </form>
+          </div>
+        </div>
+      </section>`;
+
+    const wrap = document.getElementById("contact-form-wrap");
+    document.getElementById("contact-mail-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const name = document.getElementById("c-name").value;
+      wrap.innerHTML = `<div class="initial-loader" style="padding:4rem 0;"><div class="spinner"></div><p>Sealing envelope...</p></div>`;
+      setTimeout(() => {
+        wrap.innerHTML = `<div class="contact-success-msg"><i class="fa-solid fa-envelope-open-text"></i><h3>Letter Sent!</h3><p>Thank you, <strong>${escHtml(name)}</strong>. Elara will read your letter shortly.</p><button id="reset-contact" class="btn btn-secondary btn-sm">Write Another Letter</button></div>`;
+        document.getElementById("reset-contact").addEventListener("click", () => renderContact(root));
+      }, 1400);
+    });
+  }
+
+  // ================================================================
+  // ADMIN VIEW
+  // ================================================================
+  function renderAdmin(root, params) {
+    const user = getCurrentUser();
+    if (!user) { renderAdminLogin(root); return; }
+    const hash = window.location.hash;
+    if (hash.includes("/admin/new")) renderAdminEditor(root, null);
+    else if (hash.includes("/admin/edit/") && params.id) { const s = getStory(params.id); renderAdminEditor(root, s || null); }
+    else renderAdminDashboard(root);
+  }
+
+  function renderAdminLogin(root) {
+    root.innerHTML = `
+      <div class="admin-container">
+        <div class="admin-auth-card">
+          <div class="admin-auth-icon"><i class="fa-solid fa-feather-pointed"></i></div>
+          <h2>Scribe's Login</h2>
+          <p>Enter the inner chamber to write, draft, and publish your chronicles.</p>
+          <div id="auth-err" class="auth-error" style="display:none;"></div>
+          <form id="admin-login-form">
+            <div class="form-group"><label for="lu">Username</label><input type="text" id="lu" class="form-control" required placeholder="admin"></div>
+            <div class="form-group"><label for="lp">Passphrase</label><input type="password" id="lp" class="form-control" required placeholder="••••••••"></div>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1.5rem;text-align:left;"><i class="fa-solid fa-circle-info"></i> Default: <code>admin</code> / <code>writer123</code></p>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Enter Chamber</button>
+          </form>
+        </div>
+      </div>`;
+    document.getElementById("admin-login-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const ok = storeLogin(document.getElementById("lu").value.trim(), document.getElementById("lp").value.trim());
+      if (ok) { window.location.hash = "#/admin"; }
+      else { const err = document.getElementById("auth-err"); err.style.display="block"; err.textContent="Invalid scribe credentials."; }
+    });
+  }
+
+  function renderAdminDashboard(root) {
+    const stories = getStories(true);
+    const bm = getBookmarks();
+    let totalChapters = 0, totalWords = 0;
+    stories.forEach(s => { totalChapters += s.chapters.length; s.chapters.forEach(c => { totalWords += c.content.split(/\s+/).filter(Boolean).length; }); });
+
+    root.innerHTML = `
+      <div class="admin-container">
+        <div class="admin-dashboard-header">
+          <div><span class="section-subtitle">Chamber of Administration</span><h2 class="editor-title" style="margin-top:0.2rem;">Storyteller's Desk</h2></div>
+          <div class="admin-user-profile">
+            <div class="admin-user-info"><span class="admin-user-name">Elara Vance</span><span class="admin-logout-btn" id="admin-logout">Leave Chamber</span></div>
+            <div style="font-size:2.2rem;">👩‍💻</div>
+          </div>
+        </div>
+        <div class="admin-stats-grid">
+          <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-book"></i></div><div><div class="stat-number">${stories.length}</div><div class="stat-label">Total Stories</div></div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-list-ol"></i></div><div><div class="stat-number">${totalChapters}</div><div class="stat-label">Chapters</div></div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-paragraph"></i></div><div><div class="stat-number">${(Math.round(totalWords/100)/10)}k</div><div class="stat-label">Words Written</div></div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-bookmark" style="color:var(--accent-gold)"></i></div><div><div class="stat-number">${bm.length}</div><div class="stat-label">Bookmarks</div></div></div>
+        </div>
+        <div class="admin-table-section">
+          <div class="table-header-row">
+            <h3>Your Library</h3>
+            <a href="#/admin/new" class="btn btn-primary btn-sm"><i class="fa-solid fa-circle-plus"></i> Write New Story</a>
+          </div>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead><tr><th>Title</th><th>Genre</th><th>Chapters</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+              <tbody>
+                ${stories.length ? stories.map(s => `
+                  <tr id="row-${s.id}">
+                    <td><span class="admin-story-row-title">${escHtml(s.title)}</span><span class="admin-story-row-excerpt">${escHtml(s.excerpt)}</span></td>
+                    <td>${escHtml(s.genre)}</td>
+                    <td>${s.chapters.length}</td>
+                    <td><span class="status-badge status-${s.status}">${s.status}</span></td>
+                    <td>${fmtDate(s.publishDate)}</td>
+                    <td><div class="table-actions">
+                      <a href="#/story/${s.id}" class="table-action-btn" title="Preview"><i class="fa-regular fa-eye"></i></a>
+                      <a href="#/admin/edit/${s.id}" class="table-action-btn" title="Edit"><i class="fa-regular fa-pen-to-square"></i></a>
+                      <button class="table-action-btn btn-delete" data-id="${s.id}" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
+                    </div></td>
+                  </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--text-muted);font-style:italic;">No stories yet. Grab your quill!</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>`;
+
+    document.getElementById("admin-logout").addEventListener("click", () => { storeLogout(); window.location.hash = "#/admin"; });
+    root.querySelectorAll(".btn-delete").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.id;
+        const s = getStory(id);
+        if (s && confirm(`Permanently delete "${s.title}"? This cannot be undone.`)) {
+          deleteStory(id);
+          document.getElementById(`row-${id}`)?.remove();
+        }
+      });
+    });
+  }
+
+  function renderAdminEditor(root, existingStory) {
+    const isEdit = !!existingStory;
+    let storyData = existingStory ? JSON.parse(JSON.stringify(existingStory)) : {
+      id:"", title:"", genre:"Fantasy", author:"Elara Vance", cover:"", excerpt:"", readingTime:5,
+      publishDate: new Date().toISOString().split('T')[0], popularity:0, status:"draft",
+      chapters:[{title:"Chapter 1: The Beginning", content:""}]
+    };
+    let chaptersLocal = JSON.parse(JSON.stringify(storyData.chapters));
+    let currentCover = storyData.cover;
+
+    root.innerHTML = `
+      <div class="admin-container">
+        <div class="editor-header">
+          <div>
+            <span class="section-subtitle">${isEdit ? 'Editing Chronicle' : 'Weaving a New Narrative'}</span>
+            <h2 class="editor-title">${isEdit ? escHtml(storyData.title) : 'The Quill Room'}</h2>
+          </div>
+          <div style="display:flex;gap:1rem;">
+            <button id="editor-cancel" class="btn btn-secondary">Cancel</button>
+            <button id="editor-save" class="btn btn-primary"><i class="fa-regular fa-floppy-disk"></i> Save Story</button>
+          </div>
+        </div>
+        <div class="editor-grid">
+          <div class="editor-main-panel">
+            <div class="form-group"><label for="edit-title">Story Title</label><input type="text" id="edit-title" class="form-control" value="${escAttr(storyData.title)}" placeholder="E.g., The Midnight Library" required></div>
+            <div class="form-group"><label for="edit-excerpt">Short Description</label><textarea id="edit-excerpt" class="form-control" placeholder="A brief, catchy summary..." required>${escHtml(storyData.excerpt)}</textarea></div>
+            <div class="editor-chapters-section">
+              <div class="chapters-section-header">
+                <h4>Chronicle Chapters</h4>
+                <button type="button" id="add-chapter-btn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-plus"></i> Add Chapter</button>
+              </div>
+              <div id="editor-chapters-list" class="chapters-list"></div>
+            </div>
+          </div>
+          <div class="editor-sidebar-panel">
+            <div class="form-group"><label for="edit-genre">Genre</label>
+              <select id="edit-genre" class="form-control">
+                ${["Fantasy","Mystery","Sci-Fi","Romance","Drama"].map(g=>`<option value="${g}" ${storyData.genre===g?'selected':''}>${g}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group"><label for="edit-rt">Est. Reading Time (min)</label><input type="number" id="edit-rt" class="form-control" value="${storyData.readingTime}" min="1"></div>
+            <div class="form-group"><label for="edit-status">Status</label>
+              <select id="edit-status" class="form-control">
+                <option value="draft" ${storyData.status==="draft"?"selected":""}>Draft (Hidden)</option>
+                <option value="published" ${storyData.status==="published"?"selected":""}>Published (Live)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Cover Art</label>
+              <div id="cover-preview-box" class="cover-upload-preview" style="${currentCover?'':'display:none;'}">
+                <img id="cover-preview-img" src="${currentCover||''}" alt="Cover preview">
+                <button type="button" id="remove-cover" class="remove-cover-btn">✕</button>
+              </div>
+              <div id="cover-upload-box" class="cover-upload-area" style="${currentCover?'display:none;':''}">
+                <div class="cover-upload-placeholder">
+                  <i class="fa-regular fa-image"></i>
+                  <p>Click to upload cover art</p>
+                  <span style="font-size:0.75rem;color:var(--text-muted);">PNG, JPG (Max 5MB)</span>
+                </div>
+                <input type="file" id="cover-file-input" accept="image/*" style="display:none;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    // Cover upload
+    const uploadBox = document.getElementById("cover-upload-box");
+    const fileInput = document.getElementById("cover-file-input");
+    const previewBox = document.getElementById("cover-preview-box");
+    const previewImg = document.getElementById("cover-preview-img");
+    uploadBox.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", e => {
+      const f = e.target.files[0];
+      if (f) { const r = new FileReader(); r.onload = ev => { currentCover = ev.target.result; previewImg.src = currentCover; uploadBox.style.display="none"; previewBox.style.display="block"; }; r.readAsDataURL(f); }
+    });
+    document.getElementById("remove-cover").addEventListener("click", () => { currentCover=""; previewBox.style.display="none"; uploadBox.style.display="block"; fileInput.value=""; });
+
+    // Chapters
+    const chapListEl = document.getElementById("editor-chapters-list");
+    function renderChaps() {
+      chapListEl.innerHTML = chaptersLocal.map((ch, i) => `
+        <div class="chapter-accordion-card">
+          <div class="chapter-accordion-header" data-idx="${i}">
+            <h5>Ch. ${i+1}: <span id="ch-lbl-${i}">${escHtml(ch.title||'Untitled')}</span></h5>
+            <div class="chapter-accordion-actions">
+              <button type="button" class="btn btn-secondary btn-sm btn-del-ch" data-idx="${i}"><i class="fa-regular fa-trash-can"></i></button>
+              <i class="fa-solid fa-chevron-down accordion-arrow" id="ch-arrow-${i}" style="transition:transform 0.2s;"></i>
+            </div>
+          </div>
+          <div class="chapter-accordion-content" id="ch-box-${i}" style="display:${i===chaptersLocal.length-1?'block':'none'};">
+            <div class="form-group"><label>Chapter Title</label><input type="text" class="form-control ch-title" data-idx="${i}" value="${escAttr(ch.title)}"></div>
+            <div class="form-group" style="margin-bottom:0;"><label>Chapter Content</label><textarea class="form-control ch-content" data-idx="${i}" style="min-height:250px;">${escHtml(ch.content)}</textarea></div>
+          </div>
+        </div>`).join('');
+
+      chapListEl.querySelectorAll(".chapter-accordion-header").forEach(h => {
+        h.addEventListener("click", e => {
+          if (e.target.closest(".btn-del-ch")) return;
+          const i = h.dataset.idx;
+          const box = document.getElementById(`ch-box-${i}`);
+          const arrow = document.getElementById(`ch-arrow-${i}`);
+          const open = box.style.display !== "none";
+          box.style.display = open ? "none" : "block";
+          arrow.style.transform = open ? "rotate(0)" : "rotate(180deg)";
+        });
+      });
+      chapListEl.querySelectorAll(".ch-title").forEach(inp => {
+        inp.addEventListener("input", e => { const i=parseInt(inp.dataset.idx); chaptersLocal[i].title=e.target.value; document.getElementById(`ch-lbl-${i}`).textContent=e.target.value||'Untitled'; });
+      });
+      chapListEl.querySelectorAll(".ch-content").forEach(ta => {
+        ta.addEventListener("input", e => { chaptersLocal[parseInt(ta.dataset.idx)].content=e.target.value; });
+      });
+      chapListEl.querySelectorAll(".btn-del-ch").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i=parseInt(btn.dataset.idx);
+          if (chaptersLocal.length<=1) { alert("A story must have at least one chapter."); return; }
+          if (confirm("Delete this chapter?")) { chaptersLocal.splice(i,1); renderChaps(); }
+        });
+      });
+    }
+    renderChaps();
+
+    document.getElementById("add-chapter-btn").addEventListener("click", () => {
+      chaptersLocal.push({ title:`Chapter ${chaptersLocal.length+1}: New Chapter`, content:"" });
+      renderChaps();
+    });
+
+    document.getElementById("editor-cancel").addEventListener("click", () => {
+      if (confirm("Discard changes and return to dashboard?")) window.location.hash="#/admin";
+    });
+
+    document.getElementById("editor-save").addEventListener("click", () => {
+      const title = document.getElementById("edit-title").value.trim();
+      const excerpt = document.getElementById("edit-excerpt").value.trim();
+      if (!title || !excerpt) { alert("Please fill Title and Description."); return; }
+      const id = isEdit ? storyData.id : title.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+      saveStory({
+        ...storyData, id, title, excerpt,
+        genre: document.getElementById("edit-genre").value,
+        readingTime: parseInt(document.getElementById("edit-rt").value)||5,
+        status: document.getElementById("edit-status").value,
+        cover: currentCover || "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=400",
+        chapters: chaptersLocal
+      });
+      alert("Chronicle saved successfully!");
+      window.location.hash = "#/admin";
+    });
+  }
+
+  // ================================================================
+  // HELPER UTILITIES
+  // ================================================================
+  function storyCard(story) {
+    const bm = isBookmarked(story.id);
+    return `
+      <article class="card story-card">
+        <div class="story-card-cover">
+          <img src="${story.cover}" alt="${escAttr(story.title)} cover" onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=400'">
+          <span class="story-card-genre">${escHtml(story.genre)}</span>
+          <button class="story-card-bookmark ${bm?'bookmarked':''}" data-id="${story.id}" title="${bm?'Remove bookmark':'Bookmark'}">
+            <i class="fa-${bm?'solid':'regular'} fa-bookmark"></i>
+          </button>
+        </div>
+        <div class="story-card-content">
+          <div class="story-card-meta">
+            <span><i class="fa-regular fa-calendar"></i> ${fmtDate(story.publishDate)}</span>
+            <span><i class="fa-regular fa-clock"></i> ${story.readingTime} min</span>
+          </div>
+          <h3 class="story-card-title"><a href="#/story/${story.id}">${escHtml(story.title)}</a></h3>
+          <p class="story-card-excerpt">${escHtml(story.excerpt)}</p>
+          <div class="story-card-footer">
+            <a href="#/story/${story.id}" class="read-more-link">Read Tale <i class="fa-solid fa-arrow-right-long"></i></a>
+            <span class="story-card-popularity"><i class="fa-solid fa-heart" style="color:var(--accent-gold);"></i> ${story.popularity}</span>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  function bindBookmarkBtns(scope) {
+    scope.querySelectorAll(".story-card-bookmark, .bookmark-btn").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.preventDefault();
+        const id = btn.dataset.id;
+        const active = toggleBookmark(id);
+        document.querySelectorAll(`[data-id="${id}"]`).forEach(b => {
+          b.classList.toggle("bookmarked", active);
+          const i = b.querySelector("i");
+          if (i) i.className = `fa-${active?'solid':'regular'} fa-bookmark`;
+          b.title = active ? "Remove bookmark" : "Bookmark";
+        });
+      });
+    });
+  }
+
+  function parseContent(text) {
+    return text.split('\n\n').map(p => {
+      if (!p.trim()) return '';
+      if (p.trim().startsWith('*') && p.trim().endsWith('*')) {
+        return `<p style="font-style:italic;text-align:center;margin:2rem 0;color:var(--text-secondary);">${escHtml(p.replace(/\*/g,''))}</p>`;
+      }
+      return `<p>${escHtml(p.trim())}</p>`;
+    }).join('');
+  }
+
+  function fmtDate(d) {
+    try { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+    catch(e) { return d; }
+  }
+  function fmtDateLong(d) {
+    try { return new Date(d).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}); }
+    catch(e) { return d; }
+  }
+  function escHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(str) { return escHtml(str); }
+
+  // ================================================================
+  // BOOTSTRAP
+  // ================================================================
+  document.addEventListener("DOMContentLoaded", () => {
+    initStore();
+
+    // Initial navigation + listen for hash changes
+    navigate();
+    window.addEventListener("hashchange", navigate);
+
+    // Theme Toggle
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+      const cur = document.documentElement.getAttribute("data-theme");
+      const next = cur === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("taleweave-theme", next);
+    });
+
+    // Mobile Drawer
+    const menuBtn = document.getElementById("mobile-menu-btn");
+    const drawer = document.getElementById("mobile-drawer");
+    const overlay = document.getElementById("drawer-overlay");
+    const closeDrawer = () => { drawer.classList.remove("open"); menuBtn.classList.remove("open"); overlay.classList.remove("visible"); drawer.setAttribute("aria-hidden","true"); };
+    menuBtn.addEventListener("click", () => {
+      const isOpen = drawer.classList.toggle("open");
+      menuBtn.classList.toggle("open");
+      overlay.classList.toggle("visible");
+      drawer.setAttribute("aria-hidden", !isOpen);
+    });
+    overlay.addEventListener("click", closeDrawer);
+    drawer.querySelectorAll(".mobile-nav-item").forEach(a => a.addEventListener("click", closeDrawer));
+
+    // Reading progress bar on scroll
+    window.addEventListener("scroll", () => {
+      const hash = window.location.hash;
+      if (hash.startsWith("#/story/") && !hash.includes("/admin")) {
+        const bar = document.getElementById("reading-progress-bar");
+        if (bar) {
+          const scrolled = window.scrollY;
+          const total = document.documentElement.scrollHeight - window.innerHeight;
+          bar.style.width = total > 0 ? (scrolled/total*100)+"%" : "0%";
+        }
+      }
+    });
+
+    // Footer newsletter form
+    const nlForm = document.getElementById("footer-newsletter-form");
+    const nlSuccess = document.getElementById("newsletter-success");
+    if (nlForm) {
+      nlForm.addEventListener("submit", e => {
+        e.preventDefault();
+        nlForm.style.display = "none";
+        nlSuccess.style.display = "flex";
+      });
+    }
+  });
+  </script>
+</body>
+</html>
